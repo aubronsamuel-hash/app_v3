@@ -1,8 +1,12 @@
 import { http } from '../lib/http';
 import type { Mission } from '../types/mission';
 
-export function publishMission(id: number) {
-  return http<Mission>(`/missions/${id}/publish`, { method: 'POST' });
+export interface PublishBody {
+  message?: string;
+}
+
+export function publishMission(id: number, body?: PublishBody) {
+  return http<Mission>(`/missions/${id}/publish`, { method: 'POST', body });
 }
 
 export interface DuplicateBody {

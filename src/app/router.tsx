@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
+import Missions from '../pages/Missions';
 import { useAuthStore } from './store/auth';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -27,6 +28,7 @@ export default function Router() {
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="missions" element={<Missions />} />
         </Route>
         <Route path="*" element={<div>Not Found</div>} />
       </Routes>
