@@ -14,6 +14,7 @@ export interface Mission {
   positions: Position[];
   documents: string[];
   status: string;
+  notes?: string | null;
   created_by: number;
 }
 

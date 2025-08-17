@@ -17,6 +17,14 @@ export function useUploadFile(missionId: number) {
   });
 }
 
+export function useDeleteFile(missionId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (fileId: number) => service.deleteFile(missionId, fileId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['files', missionId] }),
+  });
+}
+
 export function useMissionIcs(missionId: number) {
   return useMutation({
     mutationFn: () => service.downloadIcs(missionId),
