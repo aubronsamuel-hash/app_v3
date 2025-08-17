@@ -1,9 +1,13 @@
 import pytest
 from datetime import datetime, timedelta
 
+
 @pytest.mark.asyncio
 async def test_mission_crud(async_client):
-    resp = await async_client.post("/auth/token", data={"username": "admin", "password": "admin"})
+    resp = await async_client.post(
+        "/auth/token",
+        data={"username": "admin", "password": "admin"},
+    )
     token = resp.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
     now = datetime.utcnow()
@@ -14,7 +18,11 @@ async def test_mission_crud(async_client):
         "location": "Paris",
         "positions": [{"label": "Tech", "count": 1}],
     }
-    resp = await async_client.post("/missions/", json=mission_in, headers=headers)
+    resp = await async_client.post(
+        "/missions/",
+        json=mission_in,
+        headers=headers,
+    )
     assert resp.status_code == 200
     mission_id = resp.json()["id"]
     resp = await async_client.get("/missions/", headers=headers)
