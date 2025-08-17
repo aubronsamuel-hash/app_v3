@@ -9,6 +9,7 @@ from ..rate_limit import rate_limit
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 
+
 @router.get("/")
 async def list_missions(
     session: AsyncSession = Depends(get_session),
@@ -17,6 +18,7 @@ async def list_missions(
     result = await session.execute(select(models.Mission))
     missions = result.scalars().all()
     return [schemas.MissionOut.model_validate(m) for m in missions]
+
 
 @router.post("/", dependencies=[Depends(rate_limit)])
 async def create_mission(
@@ -39,6 +41,7 @@ async def create_mission(
     await session.commit()
     await session.refresh(mission)
     return schemas.MissionOut.model_validate(mission)
+
 
 @router.get("/{mission_id}")
 async def get_mission(
