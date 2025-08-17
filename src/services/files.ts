@@ -48,3 +48,7 @@ export async function downloadIcs(missionId: number): Promise<Blob> {
   }
   return await res.blob();
 }
+
+export function deleteFile(missionId: number, fileId: number) {
+  return http<void>(`/missions/${missionId}/files/${fileId}`, { method: 'DELETE' });
+}

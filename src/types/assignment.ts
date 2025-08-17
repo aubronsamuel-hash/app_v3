@@ -2,6 +2,7 @@ export interface Assignment {
   id: number;
   mission_id: number;
   user_id?: number | null;
+  email?: string | null;
   role_label: string;
   status: string;
   channel?: string | null;
