@@ -49,6 +49,23 @@ Create `.env` from `.env.example` and adjust:
 - cadvisor: 8081 (obs)
 - Loki: 3100 (obs)
 
+## Observability
+
+Start the monitoring stack with:
+
+```bash
+docker compose --profile obs up -d
+```
+
+Grafana is available at http://localhost:3000 with default credentials `admin` / `admin`.
+Prebuilt dashboards:
+
+- FastAPI Metrics (`uid: fastapi`)
+- cAdvisor Metrics (`uid: cadvisor`)
+
+Make sure the application services are running (e.g. `docker compose --profile dev up -d`) so Prometheus and Loki have data to display.
+
+
 ## Health checks
 
 - API: http://localhost:8001/healthz
