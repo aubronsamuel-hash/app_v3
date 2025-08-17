@@ -1,8 +1,7 @@
-Push-Location "$PSScriptRoot/../backend"
+Push-Location (Join-Path $PSScriptRoot '..' 'backend')
 pytest -q
 Pop-Location
 
-Push-Location "$PSScriptRoot/../frontend"
-npm install
-npm run build
+Push-Location (Join-Path $PSScriptRoot '..' 'frontend')
+npm test
 Pop-Location
