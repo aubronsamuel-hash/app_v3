@@ -1,19 +1,15 @@
 import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { http } from '../lib/http';
-import { useAuthStore, User, UserPrefs } from '../app/store/auth';
+import { useAuthStore } from '../app/store/auth';
+import { login, getMe, updatePrefs } from '../services/auth';
+import type { User, UserPrefs } from '../types/user';
 
-type LoginInput = { username: string; password: string };
 export function useLogin() {
-  const login = useAuthStore((s) => s.login);
+  const loginStore = useAuthStore((s) => s.login);
   return useMutation({
-    mutationFn: (data: LoginInput) =>
-      http<{ token: string }>('/auth/token-json', {
-        method: 'POST',
-        body: data,
-      }),
+    mutationFn: login,
     onSuccess: (data) => {
-      login(data.token);
+      loginStore(data.token);
     },
   });
 }
@@ -22,7 +18,7 @@ export function useMe(options?: { enabled?: boolean }) {
   const token = useAuthStore((s) => s.token);
   const query = useQuery<User>({
     queryKey: ['me', token],
-    queryFn: () => http<User>('/auth/me'),
+    queryFn: getMe,
     enabled: options?.enabled ?? Boolean(token),
   });
   useEffect(() => {
@@ -36,8 +32,7 @@ export function useMe(options?: { enabled?: boolean }) {
 export function useUpdatePrefs() {
   const setPrefs = useAuthStore((s) => s.setPrefs);
   return useMutation({
-    mutationFn: (prefs: UserPrefs) =>
-      http<User>('/auth/me/prefs', { method: 'PUT', body: prefs }),
+    mutationFn: (prefs: UserPrefs) => updatePrefs(prefs),
     onSuccess: (user) => {
       if (user.prefs) {
         setPrefs(user.prefs);
@@ -45,4 +40,3 @@ export function useUpdatePrefs() {
     },
   });
 }
-
