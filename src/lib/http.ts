@@ -20,7 +20,9 @@ async function request(path: string, options: HttpOptions = {}, retry = false): 
     ...options.headers,
   };
   let body: BodyInit | undefined;
-  if (options.body !== undefined) {
+  if (options.body instanceof FormData) {
+    body = options.body;
+  } else if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json';
     body = JSON.stringify(options.body);
   }
@@ -70,4 +72,3 @@ export async function http<T>(path: string, opts: HttpOptions = {}): Promise<T> 
   }
   return (await res.json()) as T;
 }
-

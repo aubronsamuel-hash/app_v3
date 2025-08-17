@@ -1,14 +1,5 @@
 import { create } from 'zustand';
-
-export interface UserPrefs {
-  [key: string]: unknown;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  prefs?: UserPrefs;
-}
+import type { User, UserPrefs } from '../../types/user';
 
 interface AuthState {
   token: string | null;
@@ -33,8 +24,5 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token: null, me: null });
   },
   setPrefs: (prefs) =>
-    set((state) =>
-      state.me ? { me: { ...state.me, prefs } } : state
-    ),
+    set((state) => (state.me ? { me: { ...state.me, prefs } } : state)),
 }));
-
