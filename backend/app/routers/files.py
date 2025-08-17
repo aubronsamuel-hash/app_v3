@@ -10,6 +10,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 UPLOAD_DIR = "uploaded"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 @router.post("/")
 async def upload_file(file: UploadFile, user=Depends(require_auth)):
     data = await file.read()
