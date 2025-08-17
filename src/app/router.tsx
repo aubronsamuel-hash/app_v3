@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
+import Templates from '../pages/Templates';
 import Dev from '../pages/Dev';
 import { useAuthStore } from './store/auth';
 
@@ -29,6 +30,7 @@ export default function Router() {
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="templates" element={<Templates />} />
         </Route>
         <Route path="*" element={<div>Not Found</div>} />
       </Routes>
