@@ -1,25 +1,23 @@
-FRONTEND REACT TS + TYPED API CLIENT
+REVERSE PROXY CADDY + SECURITY HEADERS
 
 USER:
-In frontend/, scaffold React + TS + Vite app with Tailwind and minimal UI primitives (Button/Card/Badge).
+Add deploy/caddy/Caddyfile for local and prod:
 
-Provide:
+Serve frontend static (optional) or proxy to front dev server.
 
-package.json scripts: dev, build, preview, lint, typecheck.
+Reverse-proxy /api to backend API :8001
 
-src/lib/api.ts: typed HTTP client (base from VITE_API_BASE, bearer token support, error typing).
+TLS (placeholder for prod), HSTS, CSP minimal, X-Frame-Options, Referrer-Policy.
 
-src/lib/hooks.ts: useAuth(), useMissions(), usePlanning(), useAdminUsers() using react-query.
+Basic auth gates for /_internal/* (Grafana, Prometheus, Dozzle).
 
-Pages: Login, Dashboard, Missions (list + detail + actions publish/duplicate), Planning (week), Admin Users, Settings.
+Update compose.yaml:
 
-Replace mocks by hooks calling backend endpoints (document mapping).
-
-.env.example with VITE_API_BASE=http://127.0.0.1:8001
+caddy service on 8080, mount Caddyfile, depends_on api/front.
 
 Checks:
 
-npm run build succeeds.
+curl http://localhost:8080/healthz via caddy -> 200
 
-Show a short demo code that fetches GET /auth/me with stored token.
+Security headers present on responses.
 
