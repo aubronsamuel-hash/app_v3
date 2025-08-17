@@ -1,7 +1,8 @@
-Cree router auth.py:
-- POST /auth/register: username, password -> cree user, role=intermittent.
-- POST /auth/token-json: JSON {username,password} -> retourne {access_token} (non JWT).
-- GET /auth/me: retourne profil courant.
-- PUT /auth/me/prefs: maj notification prefs (email?, telegram?, telegram_chat_id?).
-- POST /auth/me/notify-test: si prefs actifs, log/return un objet simulant envoi (dry-run).
-Gestion erreurs en FR (ASCII sans accents) et HTTP codes corrects.
+Cree missions.py:
+- GET /missions avec filtres q,status,date_from,date_to,role,perfect_match,page,per_page.
+- POST /missions: creation avec MissionCreateIn -> MissionOut.
+- GET /missions/{mid}, PUT /missions/{mid}, DELETE (soft delete) -> 204.
+
+Cree assignments.py:
+- POST /missions/{mid}/assign: AssignmentIn {role_label, user_id?, status?} -> AssignmentOut; verifie role_label existe.
+- GET /missions/{mid}/assignments, PUT /assignments/{aid}, DELETE /assignments/{aid}.
