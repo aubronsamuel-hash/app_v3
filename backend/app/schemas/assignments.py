@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 
+
 class AssignmentBase(BaseModel):
     mission_id: int
     user_id: int | None = None
@@ -9,8 +10,10 @@ class AssignmentBase(BaseModel):
     channel: str | None = None
     responded_at: datetime | None = None
 
+
 class AssignmentIn(AssignmentBase):
     pass
+
 
 class AssignmentOut(AssignmentBase):
     id: int

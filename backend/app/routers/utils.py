@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,10 +8,11 @@ from ..config import settings
 
 router = APIRouter(tags=["utils"])
 
+
 @router.get("/healthz")
 async def healthz(
     session: AsyncSession = Depends(get_session),
-    redis = Depends(get_redis),
+    redis=Depends(get_redis),
 ):
     db_ok = True
     try:
@@ -24,4 +24,9 @@ async def healthz(
         await redis.ping()
     except Exception:
         redis_ok = False
-    return {"ok": True, "db": db_ok, "redis": redis_ok, "version": settings.version}
+    return {
+        "ok": True,
+        "db": db_ok,
+        "redis": redis_ok,
+        "version": settings.version,
+    }
