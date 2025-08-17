@@ -1,11 +1,15 @@
-import { useAuth } from '../lib/hooks';
-import { Button } from '../components/ui/Button';
+import { useAuth } from '../hooks/useAuth'
+import { Button } from '../components/ui/Button'
 
 export default function Settings() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth()
   return (
-    <div className="p-4">
-      <Button onClick={logout}>Logout</Button>
+    <div>
+      <div>Name: {user?.username}</div>
+      <div>Email: {user?.email}</div>
+      <Button className="mt-4" onClick={logout}>
+        Logout
+      </Button>
     </div>
-  );
+  )
 }

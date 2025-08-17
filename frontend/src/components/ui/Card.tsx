@@ -1,5 +1,6 @@
-import { PropsWithChildren } from 'react';
+import { HTMLAttributes } from 'react'
+import clsx from 'clsx'
 
-export function Card({ children }: PropsWithChildren) {
-  return <div className="rounded border bg-white p-4 shadow-sm">{children}</div>;
+export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={clsx('border rounded p-4 bg-white dark:bg-gray-800', className)} {...props} />
 }
