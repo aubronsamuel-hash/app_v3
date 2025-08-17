@@ -1,5 +1,6 @@
 import { http } from '../lib/http';
 import type { Mission, MissionInput } from '../types/mission';
+import type { Paginated } from '../types/common';
 
 export interface MissionListParams {
   q?: string;
@@ -21,7 +22,9 @@ function qs(params?: Record<string, unknown>) {
 }
 
 export function listMissions(params?: MissionListParams) {
-  return http<Mission[]>(`/missions${qs(params as Record<string, unknown> | undefined)}`);
+  return http<Paginated<Mission>>(
+    `/missions${qs(params as Record<string, unknown> | undefined)}`
+  );
 }
 
 export function getMission(id: number) {

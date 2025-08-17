@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as service from '../services/missions';
-import type { MissionInput } from '../types/mission';
+import type { MissionInput, Mission } from '../types/mission';
+import type { Paginated } from '../types/common';
 
 export function useMissionsList(params?: service.MissionListParams) {
-  return useQuery({
+  return useQuery<Paginated<Mission>>({
     queryKey: ['missions', params],
     queryFn: () => service.listMissions(params),
   });

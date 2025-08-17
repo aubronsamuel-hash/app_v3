@@ -24,7 +24,7 @@ export async function downloadIcs(): Promise<Blob> {
     try {
       const data = await res.json();
       message = (data as { message?: string }).message ?? message;
-    } catch {}
+    } catch { /* ignore */ }
     throw { message, status: res.status };
   }
   return await res.blob();
