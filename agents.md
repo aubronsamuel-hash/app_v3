@@ -1,17 +1,16 @@
-SEED + FIXTURES + DEMO DATA
-
 USER:
-Implement backend/scripts/seed_plus.py (async):
+Add tests:
 
-Options: --reset, --users N, --missions N, --days D, --all
+backend/tests: unit + API (auth, missions, assignments, rate limit).
 
-Create admin user (admin/admin), N users with roles/skills, missions over D days with positions, sample assignments.
+frontend: Playwright e2e basic (login, navigate Missions, call publish).
 
-Output stats and admin credentials.
+perf/k6: smoke.js (sanity low VUs), load.js (ramp to 1000 VUs placeholders), output HTML to perf/reports/.
 
-Integrate in scripts/seed.ps1.
+Scripts:
+
+scripts/test_all.ps1 runs: pytest -q, npm ci && npm run build, npx playwright test, k6 run perf/smoke.js
 
 Acceptance:
 
-scripts/seed.ps1 -> admin login works, GET /missions returns data.
-
+test_all.ps1 ends with OK summary and creates perf/reports/index.html
