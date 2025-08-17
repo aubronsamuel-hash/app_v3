@@ -20,7 +20,9 @@ def _dt(value: str | None) -> datetime | None:
 
 
 def _get_path() -> Path:
-    parser = argparse.ArgumentParser(description="Migrate JSON data into database")
+    parser = argparse.ArgumentParser(
+        description="Migrate JSON data into database"
+    )
     parser.add_argument("--file", help="Path to data.json")
     args = parser.parse_args()
     path = args.file or os.getenv("DATA_JSON") or "data.json"
@@ -81,7 +83,11 @@ async def _upsert_missions(session, items) -> int:
             for k, v in values.items():
                 setattr(existing, k, v)
         else:
-            mission = Mission(id=mission_id, **values) if mission_id is not None else Mission(**values)
+            mission = (
+                Mission(id=mission_id, **values)
+                if mission_id is not None
+                else Mission(**values)
+            )
             session.add(mission)
             inserted += 1
     return inserted
@@ -100,7 +106,9 @@ async def _upsert_assignments(session, items) -> int:
             "mission_id": a["mission_id"],
             "user_id": a.get("user_id"),
             "role_label": a["role_label"],
-            "status": AssignmentStatus(a.get("status", AssignmentStatus.invited)),
+            "status": AssignmentStatus(
+                a.get("status", AssignmentStatus.invited)
+            ),
             "channel": a.get("channel"),
             "responded_at": _dt(a.get("responded_at")),
         }
@@ -126,8 +134,12 @@ async def main() -> None:
     async with SessionLocal() as session:
         counts = {}
         counts["users"] = await _upsert_users(session, data.get("users", []))
-        counts["missions"] = await _upsert_missions(session, data.get("missions", []))
-        counts["assignments"] = await _upsert_assignments(session, data.get("assignments", []))
+        counts["missions"] = await _upsert_missions(
+            session, data.get("missions", [])
+        )
+        counts["assignments"] = await _upsert_assignments(
+            session, data.get("assignments", [])
+        )
         await session.commit()
     for table, count in counts.items():
         print(f"{table}: inserted {count}")
