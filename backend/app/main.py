@@ -6,6 +6,7 @@ from .config import settings
 from .db import Base, engine
 from .metrics import REQUEST_COUNT, router as metrics_router
 from .routers import auth, missions, assignments, admin_users, planning, files, utils
+from . import background
 
 app = FastAPI(title="Coulisses Crew Ultra API")
 
@@ -31,6 +32,7 @@ app.include_router(admin_users.router)
 app.include_router(planning.router)
 app.include_router(files.router)
 app.include_router(utils.router)
+app.include_router(background.router)
 app.include_router(metrics_router)
 
 @app.on_event("startup")
