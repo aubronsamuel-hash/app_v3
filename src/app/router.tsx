@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
+import Dev from '../pages/Dev';
 import { useAuthStore } from './store/auth';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -17,6 +18,7 @@ export default function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/_dev" element={<Dev />} />
         <Route
           path="/"
           element={

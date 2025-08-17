@@ -22,7 +22,9 @@ export async function uploadFile(missionId: number, file: File): Promise<FileMet
     try {
       const data = await res.json();
       message = (data as { message?: string }).message ?? message;
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     throw { message, status: res.status };
   }
   return (await res.json()) as FileMeta;
@@ -39,7 +41,9 @@ export async function downloadIcs(missionId: number): Promise<Blob> {
     try {
       const data = await res.json();
       message = (data as { message?: string }).message ?? message;
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     throw { message, status: res.status };
   }
   return await res.blob();
