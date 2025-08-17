@@ -15,3 +15,14 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Demo
+
+Fetch the authenticated user with a stored token:
+
+```ts
+import { me } from './src/lib/api'
+
+const token = localStorage.getItem('token')!
+me(token).then(console.log)
+```
