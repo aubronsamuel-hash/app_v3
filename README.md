@@ -2,53 +2,75 @@
 
 Monorepo containing frontend, backend and deployment tooling.
 
-## Prerequisites
-- Docker Desktop with WSL2
-- Node.js 18+
-- Python 3.11+
-- PowerShell 7
-
-## Development (Windows)
+## Quickstart (Windows PowerShell)
 
 ```powershell
-# start stack
-scripts/dev_up.ps1
-# seed demo data
-scripts/seed.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\dev_up.ps1
 ```
-Frontend available at http://localhost:5173, API at http://localhost:8001, Caddy proxy at http://localhost:8080.
 
-To stop:
+To stop services:
+
 ```powershell
-scripts/dev_down.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\dev_down.ps1
 ```
+
+Seed demo data:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\seed.ps1
+```
+
+## Environment
+
+Create `.env` from `.env.example` and adjust:
+
+- API_PORT (default 8001)
+- FRONT_PORT (5173)
+- CADDY_HTTP_PORT (8080)
+- POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT
+- REDIS_URL
+- S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY
+- ALLOWED_ORIGINS
+- TRUSTED_HOSTS
+- TOKEN_TTL_MIN
+- RATE_LIMITS_WRITE
+- RATE_LIMITS_LOGIN
+- LOG_LEVEL
+
+## Ports
+
+- API: http://localhost:8001
+- Frontend: http://localhost:5173
+- Caddy proxy: http://localhost:8080
+- Postgres: 5432
+- Redis: 6379
+- Grafana: 3000 (obs)
+- Prometheus: 9090 (obs)
+- cadvisor: 8081 (obs)
+- Loki: 3100 (obs)
+
+## Health checks
+
+- API: http://localhost:8001/healthz
+- Frontend: http://localhost:5173
+- Caddy: http://localhost:8080
 
 ## Testing
 
 ```powershell
-scripts/test_all.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\test_all.ps1
 ```
 
-## Production deployment
+## Production
+
+Build and deploy:
 
 ```powershell
-scripts/deploy_prod.ps1 -host user@server
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy_prod.ps1 -host user@server
 ```
 
 Rollback:
-```powershell
-scripts/rollback.ps1 -host user@server
-```
-
-## Migrate from JSON
 
 ```powershell
-python migrate_from_json.py
-```
-
-## Build archives
-
-```powershell
-Compress-Archive -Path backend -DestinationPath backend.zip
-Compress-Archive -Path frontend -DestinationPath frontend.zip
+powershell -ExecutionPolicy Bypass -File .\scripts\rollback.ps1 -host user@server
 ```

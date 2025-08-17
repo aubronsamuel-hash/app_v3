@@ -1,3 +1,3 @@
-Push-Location "$PSScriptRoot/../deploy"
-docker compose exec backend python scripts/seed_plus.py
+Push-Location (Join-Path $PSScriptRoot '..')
+docker compose exec api python scripts/seed_plus.py
 Pop-Location

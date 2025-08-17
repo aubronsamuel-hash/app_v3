@@ -1,0 +1,62 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "${API_PORT:-8001}:8001"
+    env_file: .env
+    profiles: [dev]
+  front:
+    build: ./frontend
+    ports:
+      - "${FRONT_PORT:-5173}:5173"
+    env_file: .env
+    profiles: [dev]
+  caddy:
+    image: caddy:latest
+    ports:
+      - "${CADDY_HTTP_PORT:-8080}:8080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - api
+      - front
+    profiles: [dev]
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    profiles: [dev]
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    profiles: [dev]
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    profiles: [obs]
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    profiles: [obs]
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8081:8080"
+    profiles: [obs]
+  loki:
+    image: grafana/loki:2.8.2
+    ports:
+      - "3100:3100"
+    profiles: [obs]
+  promtail:
+    image: grafana/promtail:2.8.2
+    volumes:
+      - /var/log:/var/log
+    profiles: [obs]

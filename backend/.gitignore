@@ -1,0 +1,10 @@
+# Python artifacts
+__pycache__/
+*.pyc
+.env
+.venv/
+.pytest_cache/
+*.db
+*.sqlite3
+*.log
+dist/
