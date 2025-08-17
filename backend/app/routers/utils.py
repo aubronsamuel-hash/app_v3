@@ -1,18 +1,27 @@
-from fastapi import APIRouter
-from fastapi.responses import PlainTextResponse
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..db import get_session
+from ..security import get_redis
+from ..config import settings
 
 router = APIRouter(tags=["utils"])
 
-REQUEST_COUNT = Counter("app_requests_total", "Total HTTP requests")
-
-
-@router.get("/healthz", response_class=PlainTextResponse)
-async def healthz():
-    REQUEST_COUNT.inc()
-    return "ok"
-
-
-@router.get("/metrics")
-async def metrics():
-    return PlainTextResponse(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+@router.get("/healthz")
+async def healthz(
+    session: AsyncSession = Depends(get_session),
+    redis = Depends(get_redis),
+):
+    db_ok = True
+    try:
+        await session.execute(text("SELECT 1"))
+    except Exception:
+        db_ok = False
+    redis_ok = True
+    try:
+        await redis.ping()
+    except Exception:
+        redis_ok = False
+    return {"ok": True, "db": db_ok, "redis": redis_ok, "version": settings.version}
