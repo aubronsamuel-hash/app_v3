@@ -1,65 +1,52 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import models, schemas
-from ..deps import get_current_user, get_db
+from ..db import get_session
+from ..security import require_auth
+from ..rate_limit import rate_limit
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 
+@router.get("/")
+async def list_missions(
+    session: AsyncSession = Depends(get_session),
+    user: models.User = Depends(require_auth),
+):
+    result = await session.execute(select(models.Mission))
+    missions = result.scalars().all()
+    return [schemas.MissionOut.model_validate(m) for m in missions]
 
-@router.get("/", response_model=List[schemas.MissionRead])
-async def list_missions(db: AsyncSession = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    stmt = select(models.Mission)
-    result = await db.execute(stmt)
-    return result.scalars().all()
-
-
-@router.post("/", response_model=schemas.MissionRead)
+@router.post("/", dependencies=[Depends(rate_limit)])
 async def create_mission(
-    mission: schemas.MissionCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
+    mission_in: schemas.MissionIn,
+    session: AsyncSession = Depends(get_session),
+    user: models.User = Depends(require_auth),
 ):
-    obj = models.Mission(**mission.dict(), owner_id=current_user.id)
-    db.add(obj)
-    await db.commit()
-    await db.refresh(obj)
-    return obj
+    mission = models.Mission(
+        title=mission_in.title,
+        start=mission_in.start,
+        end=mission_in.end,
+        location=mission_in.location,
+        call_time=mission_in.call_time,
+        positions=[p.model_dump() for p in mission_in.positions],
+        documents=mission_in.documents,
+        status=mission_in.status,
+        created_by=user.id,
+    )
+    session.add(mission)
+    await session.commit()
+    await session.refresh(mission)
+    return schemas.MissionOut.model_validate(mission)
 
-
-@router.put("/{mission_id}", response_model=schemas.MissionRead)
-async def update_mission(
+@router.get("/{mission_id}")
+async def get_mission(
     mission_id: int,
-    mission: schemas.MissionCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    user: models.User = Depends(require_auth),
 ):
-    stmt = select(models.Mission).where(models.Mission.id == mission_id)
-    result = await db.execute(stmt)
-    obj = result.scalar_one_or_none()
-    if not obj:
+    mission = await session.get(models.Mission, mission_id)
+    if not mission:
         raise HTTPException(status_code=404, detail="Mission not found")
-    for k, v in mission.dict().items():
-        setattr(obj, k, v)
-    await db.commit()
-    await db.refresh(obj)
-    return obj
-
-
-@router.delete("/{mission_id}")
-async def delete_mission(
-    mission_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
-):
-    stmt = select(models.Mission).where(models.Mission.id == mission_id)
-    result = await db.execute(stmt)
-    obj = result.scalar_one_or_none()
-    if not obj:
-        raise HTTPException(status_code=404, detail="Mission not found")
-    await db.delete(obj)
-    await db.commit()
-    return {"ok": True}
+    return schemas.MissionOut.model_validate(mission)
