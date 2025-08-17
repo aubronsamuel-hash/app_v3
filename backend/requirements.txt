@@ -4,6 +4,7 @@ gunicorn
 sqlalchemy[asyncio]
 asyncpg
 pydantic
+pydantic-settings
 python-jose
 passlib[bcrypt]
 slowapi
@@ -11,5 +12,9 @@ prometheus-client
 redis
 rq
 httpx
+pywebpush
+python-multipart
+aiosqlite
+fakeredis
 pytest
 pytest-asyncio
