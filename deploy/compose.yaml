@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    profiles: ["dev", "prod"]
+  redis:
+    image: redis:7
+    profiles: ["dev", "prod"]
+  backend:
+    build: ../backend
+    env_file:
+      - ../backend/.env.example
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8001:8001"
+    profiles: ["dev", "prod"]
+  frontend:
+    build: ../frontend
+    env_file:
+      - ../frontend/.env.example
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    profiles: ["dev", "prod"]
+  caddy:
+    image: caddy:2
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - frontend
+      - backend
+    profiles: ["dev", "prod"]
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8081:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+  loki:
+    image: grafana/loki:2.8.2
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+  promtail:
+    image: grafana/promtail:2.8.2
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+    volumes:
+      - minio-data:/data
+    profiles: ["dev", "prod"]
+volumes:
+  db-data:
+  grafana-data:
+  minio-data:

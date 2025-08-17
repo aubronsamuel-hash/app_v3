@@ -1,0 +1,10 @@
+# Global ignores
+.env
+**/.env
+node_modules/
+**/node_modules/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.log
+perf/reports/

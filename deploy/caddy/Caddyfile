@@ -1,0 +1,43 @@
+{
+    auto_https off
+}
+
+:8080 {
+    # TLS placeholder for production
+    # tls /path/to/cert /path/to/key
+
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        Content-Security-Policy "default-src 'self'"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+
+    @internal path /_internal/*
+    basicauth @internal {
+        admin $2a$14$Ne5KpSd/dhMtvPR03k3tZ.o9Xa0Jm8fz72ClMi1WQ250rVcVgojwi
+    }
+
+    handle_path /_internal/grafana/* {
+        reverse_proxy grafana:3000
+    }
+    handle_path /_internal/prometheus/* {
+        reverse_proxy prometheus:9090
+    }
+    handle_path /_internal/dozzle/* {
+        reverse_proxy dozzle:8080
+    }
+
+    handle_path /api/* {
+        reverse_proxy api:8001
+    }
+
+    handle /healthz {
+        reverse_proxy api:8001
+    }
+
+    # Serve frontend static (uncomment to serve built assets)
+    # root * /srv/frontend
+    # file_server
+    reverse_proxy front:5173
+}

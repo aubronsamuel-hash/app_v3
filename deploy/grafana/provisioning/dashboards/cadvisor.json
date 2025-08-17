@@ -1,0 +1,24 @@
+{
+  "uid": "cadvisor",
+  "title": "cAdvisor Metrics",
+  "schemaVersion": 16,
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Container CPU Usage",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "rate(container_cpu_usage_seconds_total{image!=''}[1m])", "refId": "A"}],
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Container Memory Usage",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "container_memory_usage_bytes{image!=''}", "refId": "A"}],
+      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8}
+    }
+  ]
+}
