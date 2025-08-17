@@ -10,6 +10,7 @@ from app.security import get_redis, hash_password
 
 TEST_DB_URL = "sqlite+aiosqlite:///:memory:"
 
+
 @pytest_asyncio.fixture
 async def async_client() -> AsyncClient:
     engine = create_async_engine(TEST_DB_URL)
@@ -40,7 +41,10 @@ async def async_client() -> AsyncClient:
         session.add(admin)
         await session.commit()
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
         yield client
 
     app.dependency_overrides.clear()

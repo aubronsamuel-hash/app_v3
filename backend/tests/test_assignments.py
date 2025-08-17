@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
 
+
 @pytest.mark.asyncio
 async def test_assignment_crud(async_client):
     resp = await async_client.post(
