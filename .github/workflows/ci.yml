@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        if: matrix.service == 'backend'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Set up Node
+        if: matrix.service == 'frontend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        if: matrix.service == 'backend'
+        run: |
+          pip install -r requirements.txt
+          pip install flake8
+      - name: Install dependencies
+        if: matrix.service == 'frontend'
+        run: npm ci
+      - name: Lint
+        if: matrix.service == 'backend'
+        run: flake8 .
+      - name: Lint
+        if: matrix.service == 'frontend'
+        run: npm run lint --if-present
+      - name: Test
+        if: matrix.service == 'backend'
+        run: pytest
+      - name: Test
+        if: matrix.service == 'frontend'
+        run: npm test --if-present
+      - name: Build
+        if: matrix.service == 'backend'
+        run: |
+          docker build -t backend:ci .
+          docker save backend:ci -o backend.tar
+      - name: Build
+        if: matrix.service == 'frontend'
+        run: npm run build
+      - name: Upload artifact
+        if: matrix.service == 'backend'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: ${{ matrix.service }}/backend.tar
+      - name: Upload artifact
+        if: matrix.service == 'frontend'
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: ${{ matrix.service }}/dist
