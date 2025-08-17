@@ -33,13 +33,32 @@ from app.security import hash_password
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Seed database with demo data")
-    parser.add_argument("--reset", action="store_true", help="Reset database before seeding")
-    parser.add_argument("--users", type=int, default=5, help="Number of regular users to create")
-    parser.add_argument(
-        "--missions", type=int, default=3, help="Number of missions per day"
+    parser = argparse.ArgumentParser(
+        description="Seed database with demo data"
     )
-    parser.add_argument("--days", type=int, default=3, help="Number of days to generate missions for")
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Reset database before seeding",
+    )
+    parser.add_argument(
+        "--users",
+        type=int,
+        default=5,
+        help="Number of regular users to create",
+    )
+    parser.add_argument(
+        "--missions",
+        type=int,
+        default=3,
+        help="Number of missions per day",
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        default=3,
+        help="Number of days to generate missions for",
+    )
     parser.add_argument(
         "--all",
         action="store_true",
@@ -89,7 +108,12 @@ async def _create_users(session, count: int) -> list[User]:
 
 
 async def _create_missions(
-    session, *, creator: User, users: list[User], missions_per_day: int, days: int
+    session,
+    *,
+    creator: User,
+    users: list[User],
+    missions_per_day: int,
+    days: int,
 ) -> tuple[list[Mission], list[Assignment]]:
     missions: list[Mission] = []
     assignments: list[Assignment] = []
@@ -167,4 +191,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-
