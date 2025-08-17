@@ -15,6 +15,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 http_bearer = HTTPBearer(auto_error=False)
 redis = aioredis.from_url(settings.redis_url, decode_responses=True)
 
+
 async def get_redis() -> aioredis.Redis:
     yield redis
 
@@ -40,20 +41,31 @@ async def require_auth(
     redis: aioredis.Redis = Depends(get_redis),
 ) -> models.User:
     if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
     token = credentials.credentials
     user_id = await redis.get(f"token:{token}")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
     stmt = select(models.User).where(models.User.id == int(user_id))
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
     return user
 
 
-async def require_admin(user: models.User = Depends(require_auth)) -> models.User:
+async def require_admin(
+    user: models.User = Depends(require_auth),
+) -> models.User:
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough privileges")
     return user
