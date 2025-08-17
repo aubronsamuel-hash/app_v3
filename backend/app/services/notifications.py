@@ -19,16 +19,26 @@ QUEUE_KEY = "jobs"
 EMAIL_LIMIT_PER_MIN = int(os.getenv("EMAIL_RATE_PER_MIN", "60"))
 
 
-async def enqueue_invite(redis: aioredis.Redis, payload: Dict[str, Any]) -> None:
+async def enqueue_invite(
+    redis: aioredis.Redis, payload: Dict[str, Any]
+) -> None:
     """Push an invite job onto the queue."""
 
-    await redis.lpush(QUEUE_KEY, json.dumps({"type": "invite", "data": payload}))
+    await redis.lpush(
+        QUEUE_KEY,
+        json.dumps({"type": "invite", "data": payload}),
+    )
 
 
-async def enqueue_publish(redis: aioredis.Redis, payload: Dict[str, Any]) -> None:
+async def enqueue_publish(
+    redis: aioredis.Redis, payload: Dict[str, Any]
+) -> None:
     """Push a publish job onto the queue."""
 
-    await redis.lpush(QUEUE_KEY, json.dumps({"type": "publish", "data": payload}))
+    await redis.lpush(
+        QUEUE_KEY,
+        json.dumps({"type": "publish", "data": payload}),
+    )
 
 
 async def _rate_limit_email(redis: aioredis.Redis, recipient: str) -> bool:
@@ -41,7 +51,13 @@ async def _rate_limit_email(redis: aioredis.Redis, recipient: str) -> bool:
     return count <= EMAIL_LIMIT_PER_MIN
 
 
-async def _send_email(redis: aioredis.Redis, to: str, subject: str, body: str, dry_run: bool) -> None:
+async def _send_email(
+    redis: aioredis.Redis,
+    to: str,
+    subject: str,
+    body: str,
+    dry_run: bool,
+) -> None:
     if not await _rate_limit_email(redis, to):
         logger.warning("Email rate limit exceeded for %s", to)
         return
@@ -75,12 +91,18 @@ async def _send_telegram(chat_id: str, text: str, dry_run: bool) -> None:
         await client.post(url, json={"chat_id": chat_id, "text": text})
 
 
-async def _send_webpush(subscription: Dict[str, Any], data: str, dry_run: bool) -> None:
+async def _send_webpush(
+    subscription: Dict[str, Any],
+    data: str,
+    dry_run: bool,
+) -> None:
     if dry_run:
         logger.info("[dry-run] webpush: %s", data)
         return
     vapid_private_key = os.getenv("VAPID_PRIVATE_KEY")
-    vapid_claims = {"sub": os.getenv("VAPID_SUBJECT", "mailto:admin@example.com")}
+    vapid_claims = {
+        "sub": os.getenv("VAPID_SUBJECT", "mailto:admin@example.com")
+    }
     await asyncio.to_thread(
         webpush,
         subscription_info=subscription,
