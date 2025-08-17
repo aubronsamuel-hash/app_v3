@@ -1,0 +1,5 @@
+[project]
+name = "coulisses-backend"
+version = "0.1.0"
+description = "Backend for Coulisses Crew Ultra V2"
+requires-python = ">=3.11"
