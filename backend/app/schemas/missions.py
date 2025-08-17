@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+
 class Position(BaseModel):
     label: str
     count: int = Field(..., ge=1)
     skills: dict = Field(default_factory=dict)
+
 
 class MissionBase(BaseModel):
     title: str
@@ -32,8 +34,10 @@ class MissionBase(BaseModel):
             raise ValueError("position labels must be unique")
         return self
 
+
 class MissionIn(MissionBase):
     pass
+
 
 class MissionOut(MissionBase):
     id: int
