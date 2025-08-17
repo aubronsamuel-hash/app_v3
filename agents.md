@@ -1,16 +1,20 @@
+OBSERVABILITY (PROMETHEUS, GRAFANA, LOKI)
+
 USER:
-Add tests:
+Wire minimal observability:
 
-backend/tests: unit + API (auth, missions, assignments, rate limit).
+deploy/prometheus/prometheus.yml scraping: api:/metrics, cadvisor, node exporters if any.
 
-frontend: Playwright e2e basic (login, navigate Missions, call publish).
+deploy/grafana/provisioning: dashboards for FastAPI (req rate, latency p50/p95/p99), Postgres (if exporter added), Docker cAdvisor.
 
-perf/k6: smoke.js (sanity low VUs), load.js (ramp to 1000 VUs placeholders), output HTML to perf/reports/.
+deploy/loki+promtail: collect api and caddy logs.
 
-Scripts:
+compose.yaml profile "obs" to enable grafana, prometheus, loki, promtail, cadvisor.
 
-scripts/test_all.ps1 runs: pytest -q, npm ci && npm run build, npx playwright test, k6 run perf/smoke.js
+Docs:
 
-Acceptance:
+README: how to open Grafana at http://localhost:3000 (dev), default creds, dashboards ids.
 
-test_all.ps1 ends with OK summary and creates perf/reports/index.html
+Checks:
+
+docker compose --profile obs up -d -> Grafana OK, Prometheus targets up
