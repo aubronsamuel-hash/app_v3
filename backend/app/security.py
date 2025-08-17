@@ -13,7 +13,10 @@ from . import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 http_bearer = HTTPBearer(auto_error=False)
-redis = aioredis.from_url(settings.redis_url, decode_responses=True)
+redis = aioredis.from_url(
+    settings.redis_url,
+    decode_responses=True,
+)
 
 
 async def get_redis() -> aioredis.Redis:
@@ -31,7 +34,11 @@ def verify_password(plain: str, hashed: str) -> bool:
 async def create_access_token(user_id: int, redis: aioredis.Redis) -> str:
     token = secrets.token_hex(16)
     ttl = settings.token_ttl_min * 60
-    await redis.set(f"token:{token}", str(user_id), ex=ttl)
+    await redis.set(
+        f"token:{token}",
+        str(user_id),
+        ex=ttl,
+    )
     return token
 
 
@@ -52,7 +59,9 @@ async def require_auth(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-    stmt = select(models.User).where(models.User.id == int(user_id))
+    stmt = select(models.User).where(
+        models.User.id == int(user_id)
+    )
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:
@@ -67,5 +76,8 @@ async def require_admin(
     user: models.User = Depends(require_auth),
 ) -> models.User:
     if user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough privileges",
+        )
     return user
