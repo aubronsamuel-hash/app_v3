@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+gunicorn
+sqlalchemy[asyncio]
+asyncpg
+pydantic
+python-jose
+passlib[bcrypt]
+slowapi
+prometheus-client
+redis
+rq
+httpx
+pytest
+pytest-asyncio
