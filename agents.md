@@ -1,20 +1,19 @@
-OBSERVABILITY (PROMETHEUS, GRAFANA, LOKI)
+CI/CD GITHUB ACTIONS + SSH DEPLOYMENT
 
 USER:
-Wire minimal observability:
+Create .github/workflows:
 
-deploy/prometheus/prometheus.yml scraping: api:/metrics, cadvisor, node exporters if any.
+ci.yml: matrix (backend/front) -> lint, test, build; cache pip/npm; upload artifacts.
 
-deploy/grafana/provisioning: dashboards for FastAPI (req rate, latency p50/p95/p99), Postgres (if exporter added), Docker cAdvisor.
+cd.yml: on tag: build Docker images (backend, frontend) with tags API_TAG/FRONT_TAG; push to registry; SSH to server; run deploy_prod.ps1-equivalent steps (compose pull + up -d); on failure, run rollback.ps1.
 
-deploy/loki+promtail: collect api and caddy logs.
+Provide:
 
-compose.yaml profile "obs" to enable grafana, prometheus, loki, promtail, cadvisor.
+scripts/deploy_prod.ps1: login registry, docker compose -f compose.prod.yaml pull && up -d
 
-Docs:
-
-README: how to open Grafana at http://localhost:3000 (dev), default creds, dashboards ids.
+scripts/rollback.ps1: docker compose -f compose.prod.yaml down && docker compose -f compose.prod.yaml up -d 
 
 Checks:
 
-docker compose --profile obs up -d -> Grafana OK, Prometheus targets up
+Print sample run logs and required secrets list (SSH_HOST, SSH_USER, SSH_KEY, REGISTRY_*, ENV_FILE_PATH).
+
