@@ -90,3 +90,36 @@ Rollback:
 ```powershell
 pwsh scripts/rollback.ps1 -host user@server
 ```
+
+## Reverse proxy (Caddy)
+
+docker-compose service:
+
+```yaml
+caddy:
+  image: caddy:2.8
+  ports:
+    - "8080:8080"
+    # - "443:443"   # uncomment for TLS vhost
+  volumes:
+    - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+  depends_on:
+    - api
+    - front
+```
+
+Operations:
+
+```bash
+bash caddy_ops.sh fmt
+bash caddy_ops.sh validate
+bash caddy_ops.sh reload
+bash caddy_ops.sh smoke
+```
+
+Generate bcrypt for basic_auth:
+
+```bash
+docker run --rm caddy:2.8 caddy hash-password --plaintext 'yourpassword'
+```
+
