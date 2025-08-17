@@ -1,93 +1,92 @@
 # Coulisses Crew Ultra V2
 
-Monorepo containing frontend, backend and deployment tooling.
+Monorepo with FastAPI backend, Vite/Tailwind frontend and Docker tooling.
 
-## Quickstart (Windows PowerShell)
+## Prerequisites
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\dev_up.ps1
-```
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [PowerShell 7](https://learn.microsoft.com/powershell/)
+- [Node.js LTS](https://nodejs.org/)
+- [Python 3.11](https://www.python.org/)
 
-To stop services:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\dev_down.ps1
-```
-
-Seed demo data:
+## Quickstart (PowerShell)
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\seed.ps1
+cp .env.example .env
+pwsh scripts/dev_up.ps1
+pwsh scripts/seed.ps1
+pwsh scripts/test_all.ps1
+pwsh scripts/dev_down.ps1
 ```
 
-## Environment
+## Environment variables
 
-Create `.env` from `.env.example` and adjust:
+| Variable | Service | Default |
+| --- | --- | --- |
+| `API_PORT` | API | `8001` |
+| `FRONT_PORT` | Frontend | `5173` |
+| `CADDY_HTTP_PORT` | Proxy | `8080` |
+| `POSTGRES_DB` | Postgres | `appdb` |
+| `POSTGRES_USER` | Postgres | `postgres` |
+| `POSTGRES_PASSWORD` | Postgres | `postgres` |
+| `POSTGRES_HOST` | Postgres | `postgres` |
+| `POSTGRES_PORT` | Postgres | `5432` |
+| `DATABASE_URL` | API | `postgresql+asyncpg://postgres:postgres@db/postgres` |
+| `REDIS_URL` | API/Worker | `redis://redis:6379/0` |
+| `S3_ENDPOINT` | API | *(empty)* |
+| `S3_BUCKET` | API | *(empty)* |
+| `S3_ACCESS_KEY` | API | *(empty)* |
+| `S3_SECRET_KEY` | API | *(empty)* |
+| `ALLOWED_ORIGINS` | API | `http://localhost:5173` |
+| `CORS_ORIGINS` | API | `http://localhost:5173` |
+| `TRUSTED_HOSTS` | API | `localhost` |
+| `SECRET_KEY` | API | `supersecret` |
+| `TOKEN_TTL_MIN` | API | `60` |
+| `ACCESS_TOKEN_EXPIRE` | API | `60` |
+| `RATE_LIMITS_WRITE` | API | `10/minute` |
+| `RATE_LIMITS_LOGIN` | API | `5/minute` |
+| `LOG_LEVEL` | All | `info` |
+| `VITE_API_BASE` | Frontend | `http://127.0.0.1:8001` |
 
-- API_PORT (default 8001)
-- FRONT_PORT (5173)
-- CADDY_HTTP_PORT (8080)
-- POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT
-- REDIS_URL
-- S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY
-- ALLOWED_ORIGINS
-- TRUSTED_HOSTS
-- TOKEN_TTL_MIN
-- RATE_LIMITS_WRITE
-- RATE_LIMITS_LOGIN
-- LOG_LEVEL
+## Dev tasks
 
-## Ports
+### Tests
+```powershell
+pwsh scripts/test_all.ps1
+```
 
-- API: http://localhost:8001
-- Frontend: http://localhost:5173
-- Caddy proxy: http://localhost:8080
-- Postgres: 5432
-- Redis: 6379
-- Grafana: 3000 (obs)
-- Prometheus: 9090 (obs)
-- cadvisor: 8081 (obs)
-- Loki: 3100 (obs)
+### Seed data
+```powershell
+pwsh scripts/seed.ps1
+```
 
-## Observability
+### Performance
+```powershell
+docker run --rm -v ${PWD}/perf:/perf grafana/k6 run /perf/load.js
+```
 
-Start the monitoring stack with:
-
-```bash
+### Observability
+```powershell
 docker compose --profile obs up -d
 ```
+Grafana: http://localhost:3000 (admin/admin)
 
-Grafana is available at http://localhost:3000 with default credentials `admin` / `admin`.
-Prebuilt dashboards:
+## Troubleshooting
 
-- FastAPI Metrics (`uid: fastapi`)
-- cAdvisor Metrics (`uid: cadvisor`)
-
-Make sure the application services are running (e.g. `docker compose --profile dev up -d`) so Prometheus and Loki have data to display.
-
-
-## Health checks
-
-- API: http://localhost:8001/healthz
-- Frontend: http://localhost:5173
-- Caddy: http://localhost:8080
-
-## Testing
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\test_all.ps1
-```
+- **Ports**: adjust `*_PORT` variables or stop conflicting services.
+- **Volumes**: `docker compose down -v` resets Postgres/Redis data.
+- **Migrations**: `docker compose exec api alembic upgrade head`.
 
 ## Production
 
-Build and deploy:
-
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\deploy_prod.ps1 -host user@server
+pwsh scripts/deploy_prod.ps1 -host user@server
 ```
+Recommended sizes:
+- Dev/small team: 2 vCPU, 4 GB RAM (~$20/mo on most clouds)
+- Production: 4 vCPU, 8 GB RAM and managed Postgres/Redis
 
 Rollback:
-
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\rollback.ps1 -host user@server
+pwsh scripts/rollback.ps1 -host user@server
 ```
