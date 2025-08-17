@@ -1,19 +1,16 @@
-CI/CD GITHUB ACTIONS + SSH DEPLOYMENT
+SECURITY CHECKLISTS AND HARDENING
 
 USER:
-Create .github/workflows:
+Add docs in deploy/security/:
 
-ci.yml: matrix (backend/front) -> lint, test, build; cache pip/npm; upload artifacts.
+hardening_checklist.md (CSP/HSTS, CORS strict, rate limits, token rotation, secret rotation, file uploads limits 5MB, antivirus optional).
 
-cd.yml: on tag: build Docker images (backend, frontend) with tags API_TAG/FRONT_TAG; push to registry; SSH to server; run deploy_prod.ps1-equivalent steps (compose pull + up -d); on failure, run rollback.ps1.
+backups_restore.md (pg_dump/pg_restore, S3 lifecycle).
 
-Provide:
+incident_runbook.md (rollbacks, feature flags, rate limit increase).
 
-scripts/deploy_prod.ps1: login registry, docker compose -f compose.prod.yaml pull && up -d
+Provide PowerShell: scripts/security_probe.ps1 to curl critical endpoints and validate headers.
 
-scripts/rollback.ps1: docker compose -f compose.prod.yaml down && docker compose -f compose.prod.yaml up -d 
+Acceptance:
 
-Checks:
-
-Print sample run logs and required secrets list (SSH_HOST, SSH_USER, SSH_KEY, REGISTRY_*, ENV_FILE_PATH).
-
+security_probe.ps1 shows OK for headers and 413 on large upload.
