@@ -1,16 +1,21 @@
-SECURITY CHECKLISTS AND HARDENING
+TOP-LEVEL README (WINDOWS FIRST)
 
 USER:
-Add docs in deploy/security/:
+Write a top-level README.md with:
 
-hardening_checklist.md (CSP/HSTS, CORS strict, rate limits, token rotation, secret rotation, file uploads limits 5MB, antivirus optional).
+Prereqs: Docker Desktop, PowerShell 7, Node LTS, Python 3.11.
 
-backups_restore.md (pg_dump/pg_restore, S3 lifecycle).
+Quickstart dev (5 commands).
 
-incident_runbook.md (rollbacks, feature flags, rate limit increase).
+Env var table (all services).
 
-Provide PowerShell: scripts/security_probe.ps1 to curl critical endpoints and validate headers.
+How to run tests, seed, perf, observability.
+
+Troubleshooting (ports, volumes, migrations).
+
+Production notes and cost/size recommendations.
 
 Acceptance:
 
-security_probe.ps1 shows OK for headers and 413 on large upload.
+README is concise and actionable with copy-paste blocks.
+
