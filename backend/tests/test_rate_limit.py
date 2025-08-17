@@ -8,6 +8,7 @@ from app.security import get_redis, require_auth
 from app import models
 from app.main import app
 
+
 @pytest.mark.asyncio
 async def test_rate_limit(async_client):
     async def limited_rate_limit(
@@ -18,7 +19,10 @@ async def test_rate_limit(async_client):
         await real_rate_limit(request, redis, user, limit=2)
     app.dependency_overrides[real_rate_limit] = limited_rate_limit
     try:
-        resp = await async_client.post("/auth/token", data={"username": "admin", "password": "admin"})
+        resp = await async_client.post(
+            "/auth/token",
+            data={"username": "admin", "password": "admin"},
+        )
         token = resp.json()["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
         now = datetime.utcnow()
@@ -31,10 +35,18 @@ async def test_rate_limit(async_client):
         }
         for i in range(2):
             mission["title"] = f"RL Mission {i}"
-            res = await async_client.post("/missions/", json=mission, headers=headers)
+            res = await async_client.post(
+                "/missions/",
+                json=mission,
+                headers=headers,
+            )
             assert res.status_code == 200
         mission["title"] = "RL Mission last"
-        res = await async_client.post("/missions/", json=mission, headers=headers)
+        res = await async_client.post(
+            "/missions/",
+            json=mission,
+            headers=headers,
+        )
         assert res.status_code == 429
     finally:
         app.dependency_overrides.pop(real_rate_limit, None)
