@@ -1,23 +1,17 @@
-REVERSE PROXY CADDY + SECURITY HEADERS
+SEED + FIXTURES + DEMO DATA
 
 USER:
-Add deploy/caddy/Caddyfile for local and prod:
+Implement backend/scripts/seed_plus.py (async):
 
-Serve frontend static (optional) or proxy to front dev server.
+Options: --reset, --users N, --missions N, --days D, --all
 
-Reverse-proxy /api to backend API :8001
+Create admin user (admin/admin), N users with roles/skills, missions over D days with positions, sample assignments.
 
-TLS (placeholder for prod), HSTS, CSP minimal, X-Frame-Options, Referrer-Policy.
+Output stats and admin credentials.
 
-Basic auth gates for /_internal/* (Grafana, Prometheus, Dozzle).
+Integrate in scripts/seed.ps1.
 
-Update compose.yaml:
+Acceptance:
 
-caddy service on 8080, mount Caddyfile, depends_on api/front.
-
-Checks:
-
-curl http://localhost:8080/healthz via caddy -> 200
-
-Security headers present on responses.
+scripts/seed.ps1 -> admin login works, GET /missions returns data.
 
