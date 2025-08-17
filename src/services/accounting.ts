@@ -33,7 +33,9 @@ export async function exportCsv(params?: SummaryParams): Promise<Blob> {
     try {
       const data = await res.json();
       message = (data as { message?: string }).message ?? message;
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     throw { message, status: res.status };
   }
   return await res.blob();
