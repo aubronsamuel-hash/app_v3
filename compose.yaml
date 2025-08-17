@@ -6,9 +6,28 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-    networks:
-      - appnet
+      test: ["CMD-SHELL","pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [appnet]
+
+  db-init:
+    image: postgres:15
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./sql:/sql:ro
+    command: >
+      bash -lc "
+      psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /sql/schema.sql &&
+      psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /sql/seed_admin.sql
+      "
+    restart: "no"
+    networks: [appnet]
+
   api:
     build: ./api
     command: gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8001 app.main:app
@@ -16,6 +35,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
     ports:
       - "8001:8001"
     healthcheck:
