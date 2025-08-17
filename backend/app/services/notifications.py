@@ -90,14 +90,22 @@ async def _send_webpush(subscription: Dict[str, Any], data: str, dry_run: bool) 
     )
 
 
-async def _signed_link(redis: aioredis.Redis, action: str, payload: Dict[str, Any]) -> str:
+async def _signed_link(
+    redis: aioredis.Redis, action: str, payload: Dict[str, Any]
+) -> str:
     token = secrets.token_urlsafe(16)
-    await redis.set(f"link:{token}", json.dumps({"action": action, "data": payload}), ex=86400)
+    await redis.set(
+        f"link:{token}",
+        json.dumps({"action": action, "data": payload}),
+        ex=86400,
+    )
     base = os.getenv("APP_BASE_URL", "https://example.com")
     return f"{base}/{action}?token={token}"
 
 
-async def handle_invite(redis: aioredis.Redis, data: Dict[str, Any], dry_run: bool) -> None:
+async def handle_invite(
+    redis: aioredis.Redis, data: Dict[str, Any], dry_run: bool
+) -> None:
     email = data.get("email")
     chat_id = data.get("telegram")
     subscription = data.get("push")
@@ -112,7 +120,9 @@ async def handle_invite(redis: aioredis.Redis, data: Dict[str, Any], dry_run: bo
         await _send_webpush(subscription, body, dry_run)
 
 
-async def handle_publish(redis: aioredis.Redis, data: Dict[str, Any], dry_run: bool) -> None:
+async def handle_publish(
+    redis: aioredis.Redis, data: Dict[str, Any], dry_run: bool
+) -> None:
     email = data.get("email")
     chat_id = data.get("telegram")
     subscription = data.get("push")
