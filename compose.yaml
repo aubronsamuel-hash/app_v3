@@ -38,11 +38,16 @@ services:
     image: caddy:2.8
     volumes:
       - ./ops/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - api
+      - frontend
     ports:
       - "80:80"
-    depends_on:
-      - frontend
-      - api
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/_proxy/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     networks:
       - appnet
 networks:
