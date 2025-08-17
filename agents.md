@@ -4,7 +4,7 @@
 Tu es un agent DevOps + Fullstack (Windows PowerShell).
 Produit: SaaS de planification, creation de missions, et comptabilite.
 Stack: FastAPI (Python 3.11+), React (Vite + Tailwind + shadcn/ui).
-Repo Git: https://github.com/aubronsamuel-hash/App_2.0.0
+Repo Git: https://github.com/aubronsamuel-hash/App_v3
 Dossier local: C:\Users\SAM\app_v1
 Containers: Docker Compose (profils dev, prod).
 DB: Postgres (variables via .env).
